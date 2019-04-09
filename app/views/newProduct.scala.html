@@ -1,0 +1,46 @@
+@(myForm: Form[models.Product])
+
+@main("New product") {
+    <div class="container">
+        <h1>Let's create an amazing product</h1>
+        <div class="row">
+        @helper.form(action = helper.CSRF(routes.Products.submitNewProduct()), 'enctype -> "multipart/form-data") {
+            <div class="form-group">
+                <div class="form-row">
+                    @helper.inputText(myForm("ean"))
+                    @* @helper.inputText(myForm("ean"),
+                    '_label -> "Please fill the european article number,...",
+                    '_showErrors -> false,
+                    '_showConstraints -> false,
+                    'class -> "form-control",
+                    'size -> 30) *@
+                </div>
+                @for(error <- myForm("ean").errors) {
+                    <div class="form-row alert alert-danger" style="height: 50px; width: 300px;">@Messages(error.messages, error.arguments.toArray: _*)</div>
+                }
+
+
+                <div class="form-row">
+                    @helper.inputText(myForm("name"))
+                </div>
+                @for(error <- myForm("name").errors) {
+                    <div class="form-row alert alert-danger" style="height: 50px; width: 300px;">@Messages(error.messages, error.arguments.toArray: _*)</div>
+                }
+
+                <div class="form-row">
+                    @helper.inputText(myForm("description"))
+                </div>
+                @for(error <- myForm("description").errors) {
+                    <div class="form-row alert alert-danger" style="height: 50px; width: 300px;">@Messages(error.messages, error.arguments.toArray: _*)</div>
+                }
+
+                <div class="form-row">
+                    @helper.inputFile(myForm("picture"))
+                </div>
+                <p class="col-form-label" style="font-weight: bold">... And we're done, go to save :)</p>
+                <button type="submit" name="save" id="save" class="btn btn-primary">Save</button>
+            </div>
+        }
+        </div>
+    </div>
+}

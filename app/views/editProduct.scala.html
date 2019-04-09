@@ -1,0 +1,38 @@
+@(myForm: Form[models.Product])
+
+@main("Edit product") {
+    <div class="container">
+        <h1>Hey, let's modify the product of european number @myForm("ean").getValue.get !</h1>
+        <div class="row">
+        @helper.form(action = helper.CSRF(routes.Products.submitEditProduct(myForm("ean").getValue.get)), 'enctype -> "multipart/form-data") {
+            <div class="form-group">
+                <div class="form-row">
+                    <input type="hidden" name="ean" value="@myForm("ean").getValue.get" />
+                </div>
+
+                <div class="form-row">
+                    @helper.inputText(myForm("name"))
+                    @* @helper.inputText(myForm("name"),
+                        '_label -> "So let's rename your product ...",
+                        '_showErrors -> false,
+                        '_showConstraints -> false,
+                        'class -> "form-control",
+                        'size -> 30) *@
+                </div>
+                @for(error <- myForm("name").errors) {
+                    <div class="form-row alert alert-danger" style="height: 50px; width: 300px;">@Messages(error.messages, error.arguments.toArray: _*)</div>
+                }
+
+                <div class="form-row">
+                    @helper.inputText(myForm("description"))
+                </div>
+                <div class="form-row">
+                    @helper.inputFile(myForm("picture"))
+                </div>
+                <p class="col-form-label" style="font-weight: bold">... if we're done, go to save :)</p>
+                <button type="submit" name="update" id="update" class="btn btn-primary">Update</button>
+            </div>
+        }
+        </div>
+    </div>
+}

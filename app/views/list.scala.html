@@ -1,0 +1,43 @@
+@import models.Product
+
+@(products: List[Product])
+
+@main("List of products") {
+    <div class="container">
+        <h1>These are our amazing products</h1>
+
+        <p>Number of products : @products.size</p>
+
+
+        <div class="row">
+        @for(product <- products) {
+            <div class="col-md-4">
+                <div class="thumbnail">
+
+                    @if(product.picture != null && product.pictureUrl == null) {
+                        <div class="media">
+                            <div class="media-left media-middle">
+                                <a href="#">
+                                    <img class="img-responsive img-rounded" src="@routes.Products.picture(product.ean)" style="max-height: 200px; max-width: 200px;" alt="Image test" onclick="@routes.Products.editProduct(product.ean)">
+                                </a>
+                            </div>
+                        </div>
+                    }
+                    @if(product.pictureUrl != null) {
+                        <img class="square-image" src="@routes.Assets.versioned("images" + product.pictureUrl)" style="max-height: 200px; max-width: 200px;" alt="Image test" onclick="@routes.Products.editProduct(product.ean)">
+                    }
+
+                    @if(product.pictureUrl == null && product.picture == null) {
+                        <img class="square-image" src="@routes.Assets.versioned("images/latest-home-wallpaper_015623955_147.jpg")" style="max-height: 200px; max-width: 200px;" alt="Image test" onclick="@routes.Products.editProduct(product.ean)">
+                    }
+
+                <div class="caption">
+                    <a href="@routes.Products.editProduct(product.ean)"><p>@product.name<br/>@product.description</p></a>
+                    <a href="@routes.Products.detail(product.ean)"><p>Details</p></a>
+                </div>
+                </div>
+            </div>
+        }
+        </div>
+    </div>
+}

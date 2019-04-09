@@ -1,0 +1,55 @@
+@(product: Product)
+
+@main("Edit product") {
+    <div class="container">
+        <h1>All you want to known about this amazing product is here !</h1>
+        <div class="row" style="height: 880px;">
+            <div class="col">
+                @if(product.picture != null && product.pictureUrl == null) {
+                    <div class="media">
+                        <div class="media-left media-middle">
+                            <a href="#">
+                                <img class="img-responsive img-rounded" src="@routes.Products.picture(product.ean)" style="max-height: 800px; max-width: 800px;" alt="Image test" onclick="@routes.Products.editProduct(product.ean)">
+                            </a>
+                        </div>
+                    </div>
+                }
+                @if(product.pictureUrl != null) {
+                    <img class="square-image" src="@routes.Assets.versioned("images" + product.pictureUrl)" style="max-height: 800px; max-width: 800px;" alt="Image test" onclick="@routes.Products.editProduct(product.ean)">
+                }
+
+                @if(product.pictureUrl == null && product.picture == null) {
+                    <img class="square-image" src="@routes.Assets.versioned("images/latest-home-wallpaper_015623955_147.jpg")" style="max-height: 800px; max-width: 800px;" alt="Image test" onclick="@routes.Products.editProduct(product.ean)">
+                    }
+            </div>
+            <div class="col">
+                <div class="row">
+                    <label><p class="font-italic font-weight-light">Europeean article number:&nbsp;</p></label>
+                    <p>@product.ean</p>
+                </div>
+                <div class="row">
+                    <label><p class="font-italic font-weight-light">Name:&nbsp;</p></label>
+                    <p>@product.name</p>
+                </div>
+                <div class="row">
+                    <label><p class="font-italic font-weight-light">Description:&nbsp;</p></label>
+                    <p>@product.description</p>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <button onclick="deleteFunction('@product.ean')" name="delete" id="delete" class="btn btn-primary">Delete</button>
+        </div>
+    </div>
+}
+<script>
+        var deleteFunction = function(ean) {
+            $.ajax({
+                url: "/product/" + ean,
+                method: 'DELETE'
+            }).done(function() {
+                console.log("Product " + ean + " deleted with success !");
+                window.location.href = "@routes.Products.findAllProducts()"
+            });
+        }
+</script>

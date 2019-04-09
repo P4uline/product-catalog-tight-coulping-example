@@ -1,0 +1,72 @@
+@*
+* This template takes a single argument, a String containing a
+* message to display.
+*@
+@(message: String)
+    @*
+    * Call the `main` template with two arguments. The first
+    * argument is a `String` with the title of the page, the second
+    * argument is an `Html` object containing the body of the page.
+    *@
+    @main("Welcome to Play") {
+
+        <style>
+            #Hiquea  {
+                position:absolute;
+                width:100%;
+                height:100%;
+                background-color:darkslategray;
+                background-repeat:no-repeat;
+                z-index:1;
+            }
+            #CalqueNoir  {
+                position:absolute;
+                width:100%;
+                height: 100%;
+                background-color: black;
+                opacity: .7;
+                background-position: absolute;
+                z-index:2;
+            }
+            #welcome {
+                position:absolute;
+                width:100%;
+                height: 100%;
+                z-index:3;
+            }
+            #welcome-title {
+                text-align: center;
+                color: white;
+                font-weight: 900;
+                font-size: 100px;
+            }
+            #welcome-message {
+                color: white;
+                opacity: ;
+                text-align: center;
+                font-size: 25px;
+            }
+            #welcome-link {
+                text-align: center;
+                font-size: 35px;
+            }
+        </style>
+
+        <div id="welcome">
+            <div class="mainBackground col-lg-12">
+                <p id="welcome-title">@Messages("welcome.hiquea")</p>
+                <p id="welcome-message">@message</p>
+
+                <div id="welcome-link"><a href="@routes.Products.findAllProducts()">@Messages("welcome.list.of.products")</a></div>
+                <div id="welcome-link"><a href="@routes.Products.newProduct()">@Messages("welcome.create.product")</a></div>
+                <p><a href="@routes.Products.prepareLoadSamples()">@Messages("welcome.web.search.product")</a></p>
+                <p><a href="@routes.Events.listEvents()">@Messages("welcome.list.of.events")</a></p>
+            </div>
+        </div>
+        <div id="CalqueNoir">
+
+        </div>
+        <div id="Hiquea">
+            <img style="width: 100%; height: 100%;" src="@routes.Assets.versioned("images/latest-home-wallpaper_015623955_147.jpg")" />
+        </div>
+    }

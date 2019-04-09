@@ -1,0 +1,10 @@
+@import models.Event
+
+@(events: List[Event])
+
+@for(e <- events) {
+    @* FIXME : move this business rule in the business part in backend *@
+    @if(!e.`type`.equals("FLUSH_DATABASE") && !e.`type`.equals("POPULATE_DATABASE_FROM_DATAFILE")) {
+        @e <br />
+    }
+}

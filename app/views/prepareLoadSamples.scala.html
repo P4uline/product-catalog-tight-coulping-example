@@ -1,0 +1,25 @@
+@()
+
+@main("Warning") {
+    <div class="container">
+
+        <br>
+        <br>
+        <br>
+        <br>
+        <div class="col-lg-5 col-lg-offset-2">
+            <div class="panel panel-danger">
+                <div class="panel-heading">
+                    <h2>Attention</h2>
+                </div>
+                <div class="panel-body">
+                    <p>Voulez-vous supprimer la base de donnnée et recharger tous les produits ?</p>
+                    <p><a class="btn btn-danger" href="@routes.Products.loadSamples()"><i class="glyphicon glyphicon-forward"></i>
+                        Oui je veux vider la base de données</a> </p>
+                    <p><a class="btn btn-primary" href="@routes.Products.findAllProducts()"><i class="glyphicon glyphicon-backward"></i>
+                        Annuler</a> </p>
+                </div>
+            </div>
+        </div>
+    </div>
+}
