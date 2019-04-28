@@ -1,4 +1,4 @@
-@(product: Product)
+@(product: ProductEntity, events: List[Event])
 
 @main("Edit product") {
     <div class="container">
@@ -20,7 +20,7 @@
 
                 @if(product.pictureUrl == null && product.picture == null) {
                     <img class="square-image" src="@routes.Assets.versioned("images/latest-home-wallpaper_015623955_147.jpg")" style="max-height: 800px; max-width: 800px;" alt="Image test" onclick="@routes.Products.editProduct(product.ean)">
-                    }
+                }
             </div>
             <div class="col">
                 <div class="row">
@@ -40,6 +40,12 @@
         <div class="row">
             <button onclick="deleteFunction('@product.ean')" name="delete" id="delete" class="btn btn-primary">Delete</button>
         </div>
+        
+        <ul>
+        @for(event <- events) {
+            <li>@event</li>
+        }
+        </ul>
     </div>
 }
 <script>

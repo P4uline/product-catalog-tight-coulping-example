@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Entity
-public class Product extends Model {
+public class ProductEntity extends Model {
 
     @Id
     @Constraints.Required
@@ -66,30 +66,30 @@ public class Product extends Model {
 
     public String description;
 
-    private static Finder<Long, Product> find = new Finder<>(Product.class);
+    private static Finder<Long, ProductEntity> find = new Finder<>(ProductEntity.class);
 
     @Size(max = 883647)
     public byte[] picture;
     public String pictureUrl;
 
-    public Product() {
+    public ProductEntity() {
     }
 
-    public Product(String ean, String name, String description) {
+    public ProductEntity(String ean, String name, String description) {
         this.ean = ean;
         this.name = name;
         this.description = description;
     }
 
-    public static List<Product> findAll() {
+    public static List<ProductEntity> findAll() {
         return find.all();
     }
 
-    public static Optional<Product> findByEan(String ean) {
+    public static Optional<ProductEntity> findByEan(String ean) {
         return find.query().where().eq("ean", ean).findOneOrEmpty();
     }
 
-    public static List<Product> findByName(String name) {
+    public static List<ProductEntity> findByName(String name) {
         return find.query().where().eq("name", name).findList();
     }
 

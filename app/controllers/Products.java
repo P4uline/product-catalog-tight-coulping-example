@@ -5,7 +5,8 @@ import com.univocity.parsers.csv.CsvParser;
 import com.univocity.parsers.csv.CsvParserSettings;
 import io.ebean.Finder;
 import models.Event;
-import models.Product;
+import models.ProductEntity;
+import models.User;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.jetbrains.annotations.NotNull;
 import play.api.Play;
@@ -18,76 +19,101 @@ import play.mvc.Result;
 import javax.inject.Inject;
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
 
+import static controllers.Users.getCurrentUser;
 import static models.Event.EventType.*;
 import static models.Event.newEvent;
 
 public class Products extends Controller {
 
-    private final FormFactory formFactory;
+    private final FormFactory playForm;
 
-    private static Finder<Long, Product> find = new Finder<>(Product.class);
+    private static Finder<Long, ProductEntity> ebeanProductFinder = new Finder<>(ProductEntity.class);
+
+    private static Finder<Long, Event> ebeanEventFinder = new Finder<>(Event.class);
+    
+    // TODO faire un petit formulaire d'authentification et exemple de code découplé
+    
+    private User currentUser = getCurrentUser();
 
     @Inject
     public Products(FormFactory formFactory) {
-        this.formFactory = formFactory;
+        this.playForm = formFactory;
     }
 
     public Result findAllProducts() {
-        newEvent(CONSULT_ALL_PRODUCTS, "no ean").save();
-        return ok(views.html.list.render(Product.findAll()));
+        newEvent(CONSULT_ALL_PRODUCTS, "no ean", getCurrentUser().getName()).save();
+        return ok(views.html.list.render(ebeanProductFinder.all()));
     }
 
     public Result newProduct() {
-        return ok(views.html.newProduct.render(formFactory.form(Product.class)));
+        return ok(views.html.newProduct.render(playForm.form(ProductEntity.class)));
     }
 
     public Result detail(String ean) {
-        newEvent(Event.EventType.CONSULT_PRODUCT, ean).save();
         
-        return find.query().where().eq("ean", ean).findOneOrEmpty() //
-                .map( product -> ok(views.html.detail.render(product))) //
+        newEvent(Event.EventType.CONSULT_PRODUCT, ean, getCurrentUser().getName()).save();
+        List<Event> events = null;
+        if (getCurrentUser().getRole().equals(User.Role.SUPER_GESTIONNAIRE)) {
+            events = ebeanEventFinder.query().where().ne("type", Event.EventType.CHANGE_USER_ACCESS).findList();
+        } else if (getCurrentUser().getRole().equals(User.Role.GESTIONAIRE)) {
+            events = ebeanEventFinder.query().where()
+                    .ne("type", Event.EventType.CHANGE_USER_ACCESS)
+                    .eq("owner", getCurrentUser().getName())
+                    .findList();
+        } else if (getCurrentUser().getRole().equals(User.Role.ADMIN)) {
+            events = ebeanEventFinder.query().where().findList();
+        }
+
+        List<Event> finalEvents = events;
+        return ebeanProductFinder.query().where().eq("ean", ean).findOneOrEmpty() //
+                .map( product -> ok(views.html.detail.render(product, finalEvents))) //
                 .orElseGet(() -> notFound("Le produit '" + ean + "' n'a pas été trouvé")); //
     }
 
+   
+   
+   
+
     @NotNull
-    private Optional<Product> getProduct(String ean) {
-        return find.query().where().eq("ean", ean).findOneOrEmpty();
+    private Optional<ProductEntity> getProduct(String ean) {
+        return ebeanProductFinder.query().where().eq("ean", ean).findOneOrEmpty();
     }
 
     public Result editProduct(String ean) {
-        newEvent(EDIT_PRODUCT, ean).save();
-        
-        return Product.findByEan(ean) //
-                .map( product -> ok(views.html.editProduct.render(formFactory.form(Product.class).fill(product)))) //
+        newEvent(EDIT_PRODUCT, ean, getCurrentUser().getName()).save();
+
+        return ebeanProductFinder.query().where().eq("ean", ean).findOneOrEmpty() //
+                .map( product -> ok(views.html.editProduct.render(playForm.form(ProductEntity.class).fill(product)))) //
                 .orElseGet(() -> notFound("Le produit '" + ean + "' n'a pas été trouvé")); //
     }
 
     public Result submitEditProduct(String ean) {
-        newEvent(UPDATE_PRODUCT, ean).save();
+        newEvent(UPDATE_PRODUCT, ean, getCurrentUser().getName()).save();
         
-        Form<Product> productForm = formFactory.form(Product.class).bindFromRequest();
+        Form<ProductEntity> productForm = playForm.form(ProductEntity.class).bindFromRequest();
         if (productForm.hasErrors()) {
             return badRequest(views.html.editProduct.render(productForm));
         }
-        Product product = productForm.get();
+        ProductEntity product = productForm.get();
         return modifyProduct(p -> p.update(ean), product);
     }
 
     public Result submitNewProduct() {
         
-        Form<Product> productForm = formFactory.form(Product.class).bindFromRequest();
+        Form<ProductEntity> productForm = playForm.form(ProductEntity.class).bindFromRequest();
         if (productForm.hasErrors()) {
             return badRequest(views.html.newProduct.render(productForm));
         }
-        Product product = productForm.get();
-        newEvent(CREATE_PRODUCT, product.ean).save();
+        ProductEntity product = productForm.get();
+        newEvent(CREATE_PRODUCT, product.ean, getCurrentUser().getName()).save();
         return modifyProduct(p -> p.save(), product);
     }
 
-    private Result modifyProduct(Consumer<Product> modifyAction, Product toModify) {
+    private Result modifyProduct(Consumer<ProductEntity> modifyAction, ProductEntity toModify) {
         Http.MultipartFormData.FilePart<File> picture = request().body().<File>asMultipartFormData().getFile("picture");
         if (picture == null) {
             flash("error", "Missing file");
@@ -96,7 +122,7 @@ public class Products extends Controller {
         toModify.picture = getBytesFromFile(picture);
         modifyAction.accept(toModify);
         flash("success", "New product created");
-        return ok(views.html.list.render(Product.findAll()));
+        return ok(views.html.list.render(ProductEntity.findAll()));
     }
 
     private byte[] getBytesFromFile(Http.MultipartFormData.FilePart<File> picture) {
@@ -114,14 +140,14 @@ public class Products extends Controller {
     }
 
     public Result picture(String ean) {
-        return Product.findByEan(ean) //
+        return ProductEntity.findByEan(ean) //
                 .map(product -> ok(product.picture)) //
                 .orElseGet(() -> ok(Play.current().getFile("public/images/favicon.png"))); //
     }
 
     public Result delete(String ean) {
-        newEvent(CREATE_PRODUCT, ean).save();
-        Product.findByEan(ean).ifPresent(product -> product.delete());
+        newEvent(CREATE_PRODUCT, ean, getCurrentUser().getName()).save();
+        ProductEntity.findByEan(ean).ifPresent(product -> product.delete());
         flash("success", "Product deleted");
         return redirect(routes.Products.findAllProducts());
     }
@@ -131,8 +157,8 @@ public class Products extends Controller {
     }
 
     public Result loadSamples() {
-        Product.flushAll();
-        newEvent(FLUSH_DATABASE, "no ean").save();
+        ProductEntity.flushAll();
+        newEvent(FLUSH_DATABASE, "no ean", getCurrentUser().getName()).save();
 
         CsvParserSettings settings = new CsvParserSettings();
         settings.getFormat().setLineSeparator("\n");
@@ -146,10 +172,10 @@ public class Products extends Controller {
             final String ean = RandomStringUtils.randomAlphanumeric(10);
             final String name = row[0];
             final String description = row[1];
-            final Product p = new Product(ean, name, description);
+            final ProductEntity p = new ProductEntity(ean, name, description);
             p.save();
         }
-        newEvent(POPULATE_DATABASE_FROM_DATAFILE, "no ean").save();
+        newEvent(POPULATE_DATABASE_FROM_DATAFILE, "no ean", getCurrentUser().getName()).save();
         
         parser.stopParsing();
         flash("success", "Loaded a CSV file");

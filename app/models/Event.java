@@ -14,8 +14,8 @@ import java.util.List;
 public class Event extends Model {
 
 
-    public static Event newEvent(EventType eventType, String ean) {
-        return new Event(eventType, ean);
+    public static Event newEvent(EventType eventType, String ean, String owner) {
+        return new Event(eventType, ean, owner);
     }
 
     public static Finder<Long, Event> find = new Finder<>(Event.class);
@@ -31,7 +31,8 @@ public class Event extends Model {
         FLUSH_DATABASE, 
         POPULATE_DATABASE_FROM_DATAFILE, 
         CONSULT_ALL_PRODUCTS,
-        CONSULT_PRODUCT;
+        CONSULT_PRODUCT,
+        CHANGE_USER_ACCESS;
     }
 
     @Id
@@ -43,13 +44,17 @@ public class Event extends Model {
 
     @Constraints.Required
     private final String ean;
+
+    @Constraints.Required
+    public final String owner;
     
-    private Event(EventType eventType, String ean) {
+    private Event(EventType eventType, String ean, String owner) {
         this.type = eventType;
         this.ean = ean;
+        this.owner = owner;
     }
     
     public String toString() {
-        return "[" + ean + " - " + type.name() + "]";
+        return "[" + owner + " - " + ean + " - " + type.name() + "]";
     }
 }
