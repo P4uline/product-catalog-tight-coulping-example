@@ -1,4 +1,5 @@
-@(product: ProductEntity, events: List[Event])
+@import models.Event.EventType
+@(product: ProductEntity, events: List[Event], user: User)
 
 @main("Edit product") {
     <div class="container">
@@ -43,7 +44,19 @@
         
         <ul>
         @for(event <- events) {
-            <li>@event</li>
+            @if(user.getRole.equals(User.Role.GESTIONAIRE)) {
+                @if(!event.`type`.equals(EventType.POPULATE_DATABASE_FROM_DATAFILE) && event.owner.equals(user.getName)) {
+                    <li>@event</li>
+                }
+            }
+            @if(user.getRole.equals(User.Role.SUPER_GESTIONNAIRE)) {
+                @if(!event.`type`.equals(EventType.POPULATE_DATABASE_FROM_DATAFILE)) {
+                    <li>@event</li>
+                }
+            }
+            @if(user.getRole.equals(User.Role.ADMIN)) {
+                <li>@event</li> 
+            }
         }
         </ul>
     </div>

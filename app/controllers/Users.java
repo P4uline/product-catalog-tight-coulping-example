@@ -9,6 +9,6 @@ public class Users {
     private static User superGestionnaire = new User("Alex Agonal", User.Role.SUPER_GESTIONNAIRE);
 
     public static User getCurrentUser() {
-        return gestionaire;
+        return admin;
     }
 }

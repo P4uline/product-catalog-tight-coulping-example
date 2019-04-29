@@ -70,7 +70,7 @@ public class Products extends Controller {
 
         List<Event> finalEvents = events;
         return ebeanProductFinder.query().where().eq("ean", ean).findOneOrEmpty() //
-                .map( product -> ok(views.html.detail.render(product, finalEvents))) //
+                .map( product -> ok(views.html.detail.render(product, finalEvents, getCurrentUser()))) //
                 .orElseGet(() -> notFound("Le produit '" + ean + "' n'a pas été trouvé")); //
     }
 
