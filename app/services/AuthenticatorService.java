@@ -2,11 +2,8 @@ package services;
 
 import io.ebean.Finder;
 import models.CredentialUserInformation;
-import models.Event;
 import models.User;
 
-import static models.Event.EventType.CONNECTION_USER;
-import static models.Event.newEvent;
 
 public class AuthenticatorService {
 
