@@ -32,7 +32,9 @@ public class Event extends Model {
         POPULATE_DATABASE_FROM_DATAFILE, 
         CONSULT_ALL_PRODUCTS,
         CONSULT_PRODUCT,
-        CHANGE_USER_ACCESS;
+        CHANGE_USER_ACCESS,
+        //CONNECTION_USER
+        ;
     }
 
     @Id

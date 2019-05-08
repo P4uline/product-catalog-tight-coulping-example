@@ -5,13 +5,17 @@ import io.ebean.Finder;
 import models.Event;
 import models.User;
 
+import javax.inject.Inject;
 import java.util.List;
 import java.util.stream.Collectors;
 
 public class EventService {
     
+    @Inject
+    private AuthenticatorService authenticatorService;
+    
     public List<Event> findEvents() {
-        User currentUser = Users.getCurrentUser();
+        User currentUser = authenticatorService.getCurrentUser();
         
         // FIXME : le finder ne peut pas être mocké, pas d'injection de dependences.
         return new Finder<>(Event.class).all().stream().filter(e -> {

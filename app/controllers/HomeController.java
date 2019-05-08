@@ -1,9 +1,14 @@
 package controllers;
 
+import models.CredentialUserInformation;
+import models.User;
 import play.i18n.Messages;
 import play.mvc.*;
 
+import services.AuthenticatorService;
 import views.html.*;
+
+import javax.inject.Inject;
 
 /**
  * This controller contains an action to handle HTTP requests
@@ -11,6 +16,10 @@ import views.html.*;
  */
 public class HomeController extends Controller {
 
+    @Inject
+    private AuthenticatorService authenticatorService;
+
+    
     /**
      * An action that renders an HTML page with a welcome message.
      * The configuration in the <code>routes</code> file means that
@@ -24,6 +33,11 @@ public class HomeController extends Controller {
 
         Messages messages = Http.Context.current().messages();
         String ready = messages.at("welcome.ready");
+
+        CredentialUserInformation user = new CredentialUserInformation();
+        
+        authenticatorService.authenticate(user);
+            
         return ok(index.render(ready));
     }
 

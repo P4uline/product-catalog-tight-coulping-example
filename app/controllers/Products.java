@@ -15,6 +15,7 @@ import play.data.FormFactory;
 import play.mvc.Controller;
 import play.mvc.Http;
 import play.mvc.Result;
+import services.AuthenticatorService;
 
 import javax.inject.Inject;
 import java.io.File;
@@ -23,7 +24,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
 
-import static controllers.Users.getCurrentUser;
 import static models.Event.EventType.*;
 import static models.Event.newEvent;
 
@@ -37,7 +37,10 @@ public class Products extends Controller {
     
     // TODO faire un petit formulaire d'authentification et exemple de code découplé
     
-    private User currentUser = getCurrentUser();
+    
+    @Inject
+    private AuthenticatorService authenticatorService;
+    
 
     @Inject
     public Products(FormFactory formFactory) {
@@ -45,7 +48,7 @@ public class Products extends Controller {
     }
 
     public Result findAllProducts() {
-        newEvent(CONSULT_ALL_PRODUCTS, "no ean", getCurrentUser().getName()).save();
+        newEvent(CONSULT_ALL_PRODUCTS, "no ean", authenticatorService.getCurrentUser().getName()).save();
         return ok(views.html.list.render(ebeanProductFinder.all()));
     }
 
@@ -55,28 +58,24 @@ public class Products extends Controller {
 
     public Result detail(String ean) {
         
-        newEvent(Event.EventType.CONSULT_PRODUCT, ean, getCurrentUser().getName()).save();
+        newEvent(Event.EventType.CONSULT_PRODUCT, ean, authenticatorService.getCurrentUser().getName()).save();
         List<Event> events = null;
-        if (getCurrentUser().getRole().equals(User.Role.SUPER_GESTIONNAIRE)) {
+        if (authenticatorService.getCurrentUser().getRole().equals(User.Role.SUPER_GESTIONNAIRE)) {
             events = ebeanEventFinder.query().where().ne("type", Event.EventType.CHANGE_USER_ACCESS).findList();
-        } else if (getCurrentUser().getRole().equals(User.Role.GESTIONAIRE)) {
+        } else if (authenticatorService.getCurrentUser().getRole().equals(User.Role.GESTIONAIRE)) {
             events = ebeanEventFinder.query().where()
                     .ne("type", Event.EventType.CHANGE_USER_ACCESS)
-                    .eq("owner", getCurrentUser().getName())
+                    .eq("owner", authenticatorService.getCurrentUser().getName())
                     .findList();
-        } else if (getCurrentUser().getRole().equals(User.Role.ADMIN)) {
+        } else if (authenticatorService.getCurrentUser().getRole().equals(User.Role.ADMIN)) {
             events = ebeanEventFinder.query().where().findList();
         }
 
         List<Event> finalEvents = events;
         return ebeanProductFinder.query().where().eq("ean", ean).findOneOrEmpty() //
-                .map( product -> ok(views.html.detail.render(product, finalEvents, getCurrentUser()))) //
+                .map( product -> ok(views.html.detail.render(product, finalEvents, authenticatorService.getCurrentUser()))) //
                 .orElseGet(() -> notFound("Le produit '" + ean + "' n'a pas été trouvé")); //
     }
-
-   
-   
-   
 
     @NotNull
     private Optional<ProductEntity> getProduct(String ean) {
@@ -84,7 +83,7 @@ public class Products extends Controller {
     }
 
     public Result editProduct(String ean) {
-        newEvent(EDIT_PRODUCT, ean, getCurrentUser().getName()).save();
+        newEvent(EDIT_PRODUCT, ean, authenticatorService.getCurrentUser().getName()).save();
 
         return ebeanProductFinder.query().where().eq("ean", ean).findOneOrEmpty() //
                 .map( product -> ok(views.html.editProduct.render(playForm.form(ProductEntity.class).fill(product)))) //
@@ -92,7 +91,7 @@ public class Products extends Controller {
     }
 
     public Result submitEditProduct(String ean) {
-        newEvent(UPDATE_PRODUCT, ean, getCurrentUser().getName()).save();
+        newEvent(UPDATE_PRODUCT, ean, authenticatorService.getCurrentUser().getName()).save();
         
         Form<ProductEntity> productForm = playForm.form(ProductEntity.class).bindFromRequest();
         if (productForm.hasErrors()) {
@@ -109,7 +108,7 @@ public class Products extends Controller {
             return badRequest(views.html.newProduct.render(productForm));
         }
         ProductEntity product = productForm.get();
-        newEvent(CREATE_PRODUCT, product.ean, getCurrentUser().getName()).save();
+        newEvent(CREATE_PRODUCT, product.ean, authenticatorService.getCurrentUser().getName()).save();
         return modifyProduct(p -> p.save(), product);
     }
 
@@ -146,7 +145,7 @@ public class Products extends Controller {
     }
 
     public Result delete(String ean) {
-        newEvent(CREATE_PRODUCT, ean, getCurrentUser().getName()).save();
+        newEvent(CREATE_PRODUCT, ean, authenticatorService.getCurrentUser().getName()).save();
         ProductEntity.findByEan(ean).ifPresent(product -> product.delete());
         flash("success", "Product deleted");
         return redirect(routes.Products.findAllProducts());
@@ -158,7 +157,7 @@ public class Products extends Controller {
 
     public Result loadSamples() {
         ProductEntity.flushAll();
-        newEvent(FLUSH_DATABASE, "no ean", getCurrentUser().getName()).save();
+        newEvent(FLUSH_DATABASE, "no ean", authenticatorService.getCurrentUser().getName()).save();
 
         CsvParserSettings settings = new CsvParserSettings();
         settings.getFormat().setLineSeparator("\n");
@@ -175,7 +174,7 @@ public class Products extends Controller {
             final ProductEntity p = new ProductEntity(ean, name, description);
             p.save();
         }
-        newEvent(POPULATE_DATABASE_FROM_DATAFILE, "no ean", getCurrentUser().getName()).save();
+        newEvent(POPULATE_DATABASE_FROM_DATAFILE, "no ean", authenticatorService.getCurrentUser().getName()).save();
         
         parser.stopParsing();
         flash("success", "Loaded a CSV file");

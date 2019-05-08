@@ -5,11 +5,10 @@ import models.Event;
 import models.User;
 import play.mvc.Controller;
 import play.mvc.Result;
+import services.AuthenticatorService;
 import services.EventService;
 
 import javax.inject.Inject;
-
-import static controllers.Users.getCurrentUser;
 
 public class Events extends Controller {
 
@@ -17,9 +16,12 @@ public class Events extends Controller {
     
     @Inject
     private EventService eventService;
+    
+    @Inject
+    private AuthenticatorService authenticatorService;
 
     public Result listEvents() {
-        if (getCurrentUser().getRole().equals(User.Role.SUPER_GESTIONNAIRE)) {
+        if (authenticatorService.getCurrentUser().getRole().equals(User.Role.SUPER_GESTIONNAIRE)) {
             return ok(views.html.listEvent.render(ebeanEventFinder.query().where().ne("type", Event.EventType.CHANGE_USER_ACCESS).findList()));
         }
         
