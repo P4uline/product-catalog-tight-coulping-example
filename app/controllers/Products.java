@@ -35,9 +35,6 @@ public class Products extends Controller {
 
     private static Finder<Long, Event> ebeanEventFinder = new Finder<>(Event.class);
     
-    // TODO faire un petit formulaire d'authentification et exemple de code découplé
-    
-    
     @Inject
     private AuthenticatorService authenticatorService;
     
