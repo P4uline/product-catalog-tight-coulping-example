@@ -20,6 +20,9 @@ libraryDependencies ++= Seq("com.univocity" % "univocity-parsers" % "2.4.1")
 // Testing libraries for dealing with CompletionStage...
 libraryDependencies += "org.assertj" % "assertj-core" % "3.6.2" % Test
 libraryDependencies += "org.awaitility" % "awaitility" % "2.0.0" % Test
+// https://mvnrepository.com/artifact/org.mockito/mockito-all
+libraryDependencies += "org.mockito" % "mockito-all" % "1.9.5" % Test
+
 
 // Make verbose tests
 testOptions in Test := Seq(Tests.Argument(TestFrameworks.JUnit, "-a", "-v"))

@@ -13,12 +13,12 @@ public class EventService {
     
     @Inject
     private AuthenticatorService authenticatorService;
-    
+    private Finder<Object, Event> eventFinder = new Finder<>(Event.class);
+
     public List<Event> findEvents() {
         User currentUser = authenticatorService.getCurrentUser();
         
-        // FIXME : le finder ne peut pas être mocké, pas d'injection de dependences.
-        return new Finder<>(Event.class).all().stream().filter(e -> {
+        return getEventFinder().all().stream().filter(e -> {
             if (!currentUser.getRole().equals(User.Role.ADMIN)) {
                 if (currentUser.getRole().equals(User.Role.GESTIONAIRE)) {
                     return !e.type.equals(Event.EventType.CHANGE_USER_ACCESS) && e.owner.equals(currentUser.getName());  
@@ -28,5 +28,9 @@ public class EventService {
             }
             return true;
         }).collect(Collectors.toList());
+    }
+
+    protected Finder<Object, Event> getEventFinder() {
+        return eventFinder;
     }
 }
