@@ -2,6 +2,7 @@ package services;
 
 import io.ebean.Finder;
 import models.CredentialUserInformation;
+import models.Event;
 import models.User;
 
 
@@ -17,7 +18,7 @@ public class AuthenticatorService {
         if (getCurrentUser() == null && userInformation.authenticate()) {
             gestionaire.save();
             // TODO : add event CONNECTION_USER
-            //newEvent(CONNECTION_USER, "no ean", getCurrentUser().getName()).save();
+            //Event.newEvent(Event.EventType.CONNECTION_USER, "no ean", getCurrentUser().getName()).save();
         }
     }
 
