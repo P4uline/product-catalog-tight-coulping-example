@@ -8,7 +8,7 @@ create table event (
   type                          integer,
   ean                           varchar(255),
   owner                         varchar(255),
-  constraint ck_event_type check ( type in (0,1,2,3,4,5,6,7,8)),
+  constraint ck_event_type check ( type in (0,1,2,3,4,5,6,7)),
   constraint pk_event primary key (id)
 );
 

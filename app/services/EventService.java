@@ -9,6 +9,8 @@ import javax.inject.Inject;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static java.util.stream.Collectors.toList;
+
 public class EventService {
     
     @Inject
@@ -27,7 +29,11 @@ public class EventService {
                 }
             }
             return true;
-        }).collect(Collectors.toList());
+        }).collect(toList());
+    }
+    
+    public List<Event> findProuctEvents(String ean) {
+        return findEvents().stream().filter(e -> e.ean.equals(ean)).collect(toList());
     }
 
     protected Finder<Object, Event> getEventFinder() {

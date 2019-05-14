@@ -9,6 +9,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import java.util.List;
+import java.util.Objects;
 
 @Entity
 public class Event extends Model {
@@ -22,6 +23,23 @@ public class Event extends Model {
 
     public static List<Event> findAll() {
         return find.all();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Event event = (Event) o;
+        return id == event.id &&
+                type == event.type &&
+                Objects.equals(ean, event.ean) &&
+                Objects.equals(owner, event.owner);
+    }
+
+    @Override
+    public int hashCode() {
+
+        return Objects.hash(id, type, ean, owner);
     }
 
     public enum EventType {
@@ -45,7 +63,7 @@ public class Event extends Model {
     public EventType type;
 
     @Constraints.Required
-    private final String ean;
+    public final String ean;
 
     @Constraints.Required
     public final String owner;

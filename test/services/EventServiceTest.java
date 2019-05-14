@@ -42,10 +42,10 @@ public class EventServiceTest {
     
     @Mock
     private Finder<Object, Event> finder;
-    
+
     @Test
-    public void admin_should_see_all_events() {
-        Mockito.when(authenticatorServiceMock.getCurrentUser()).thenReturn(new User("Jane Doe", ADMIN));
+    public void super_gestionnaire_should_see_all_product_events_but_no_CHANGE_USER_ACCESS_event() {
+        Mockito.when(authenticatorServiceMock.getCurrentUser()).thenReturn(new User("George Abitbol", SUPER_GESTIONNAIRE));
         List<Event> events = new ArrayList<>();
         events.add(newEvent(CONSULT_ALL_PRODUCTS, "no-ean", "Jane Doe"));
         events.add(newEvent(CHANGE_USER_ACCESS, "no-ean", "Jane Doe"));
@@ -54,12 +54,41 @@ public class EventServiceTest {
         events.add(newEvent(CONSULT_PRODUCT, "34283", "John Doe"));
         events.add(newEvent(CONSULT_ALL_PRODUCTS, "34283", "John Doe"));
         events.add(newEvent(CREATE_PRODUCT, "1234", "John Doe"));
-        
+
         Mockito.when(finder.all()).thenReturn(events);
 
-        List<Event> result = eventServiceUnderTest.findEvents();
-        assertThat(result).hasSize(7);
-        assertThat(result).isEqualTo(events);
+        List<Event> actual = eventServiceUnderTest.findProuctEvents("34283");
+
+        List<Event> expected = events.stream()
+                .filter(e -> !e.type.equals(CHANGE_USER_ACCESS))
+                .filter(e -> e.ean.equals("34283"))
+                .collect(toList());
+        assertThat(actual).isEqualTo(expected);
+    }
+    
+    @Test
+    public void admin_should_see_all_events() {
+        // Given an admin user is authenticated
+        Mockito.when(authenticatorServiceMock.getCurrentUser()).thenReturn(new User("Jane Doe", ADMIN));
+        
+        // Given the list of events
+        List<Event> events = new ArrayList<>();
+        events.add(newEvent(CONSULT_ALL_PRODUCTS, "no-ean", "Jane Doe"));
+        events.add(newEvent(CHANGE_USER_ACCESS, "no-ean", "Jane Doe"));
+        events.add(newEvent(CONSULT_PRODUCT, "34283", "Jane Doe"));
+        events.add(newEvent(EDIT_PRODUCT, "34283", "John Doe"));
+        events.add(newEvent(CONSULT_PRODUCT, "34283", "John Doe"));
+        events.add(newEvent(CONSULT_ALL_PRODUCTS, "34283", "John Doe"));
+        events.add(newEvent(CREATE_PRODUCT, "1234", "John Doe"));
+        Mockito.when(finder.all()).thenReturn(events);
+
+        // When Run
+        List<Event> actual = eventServiceUnderTest.findEvents();
+        
+        // Then the admin has to access to all events
+        List<Event> expected = new ArrayList<>(actual);
+        
+        assertThat(actual).isEqualTo(expected);
     }
     
     @Test
@@ -74,13 +103,17 @@ public class EventServiceTest {
         events.add(newEvent(CONSULT_PRODUCT, "34283", "John Doe"));
         events.add(newEvent(CONSULT_ALL_PRODUCTS, "34283", "John Doe"));
         events.add(newEvent(CREATE_PRODUCT, "1234", "John Doe"));
+        events.add(newEvent(CHANGE_USER_ACCESS, "no-ean", "John Doe"));
 
         Mockito.when(finder.all()).thenReturn(events);
 
-        List<Event> result = eventServiceUnderTest.findEvents();
-        assertThat(result).hasSize(4);
-        assertThat(result).doesNotContain(newEvent(CHANGE_USER_ACCESS, "no-ean", "John Doe"));
-        assertThat(result).isEqualTo(events.stream().filter(e -> !e.type.equals(CHANGE_USER_ACCESS) && e.owner.equals("John Doe")).collect(toList()));
+        List<Event> actual = eventServiceUnderTest.findEvents();
+
+        List<Event> expected = events.stream()
+                .filter(e -> !e.type.equals(CHANGE_USER_ACCESS))
+                .filter(e -> e.owner.equals("John Doe"))
+                .collect(toList());
+        assertThat(actual).isEqualTo(expected);
     }
 
     @Test
@@ -97,9 +130,13 @@ public class EventServiceTest {
 
         Mockito.when(finder.all()).thenReturn(events);
 
-        List<Event> result = eventServiceUnderTest.findEvents();
-        assertThat(result).hasSize(6);
-        assertThat(result).doesNotContain(newEvent(CHANGE_USER_ACCESS, "no-ean", "John Doe"));
-        assertThat(result).isEqualTo(events.stream().filter(e -> !e.type.equals(CHANGE_USER_ACCESS)).collect(toList()));
+        List<Event> actual = eventServiceUnderTest.findEvents();
+        
+        List<Event> expected = events.stream()
+                .filter(e -> !e.type.equals(CHANGE_USER_ACCESS))
+                .collect(toList());
+        assertThat(actual).isEqualTo(expected);
     }
+
+    
 }
