@@ -1,13 +1,11 @@
 package services;
 
-import controllers.Users;
 import io.ebean.Finder;
 import models.Event;
 import models.User;
 
 import javax.inject.Inject;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toList;
 
@@ -22,7 +20,7 @@ public class EventService {
         
         return getEventFinder().all().stream().filter(e -> {
             if (!currentUser.getRole().equals(User.Role.ADMIN)) {
-                if (currentUser.getRole().equals(User.Role.GESTIONAIRE)) {
+                if (currentUser.getRole().equals(User.Role.GESTIONNAIRE)) {
                     return !e.type.equals(Event.EventType.CHANGE_USER_ACCESS) && e.owner.equals(currentUser.getName());  
                 } else if (currentUser.getRole().equals(User.Role.SUPER_GESTIONNAIRE)) {
                     return !e.type.equals(Event.EventType.CHANGE_USER_ACCESS);

@@ -94,7 +94,7 @@ public class EventServiceTest {
     @Test
     public void gestionnaire_should_see_all_own_events_but_no_CHANGE_USER_ACCESS_event() {
 
-        Mockito.when(authenticatorServiceMock.getCurrentUser()).thenReturn(new User("John Doe", GESTIONAIRE));
+        Mockito.when(authenticatorServiceMock.getCurrentUser()).thenReturn(new User("John Doe", GESTIONNAIRE));
         List<Event> events = new ArrayList<>();
         events.add(newEvent(CONSULT_ALL_PRODUCTS, "no-ean", "Jane Doe"));
         events.add(newEvent(CHANGE_USER_ACCESS, "no-ean", "Jane Doe"));

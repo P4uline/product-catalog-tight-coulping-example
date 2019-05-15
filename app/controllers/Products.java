@@ -59,7 +59,7 @@ public class Products extends Controller {
         List<Event> events = null;
         if (authenticatorService.getCurrentUser().getRole().equals(User.Role.SUPER_GESTIONNAIRE)) {
             events = ebeanEventFinder.query().where().ne("type", Event.EventType.CHANGE_USER_ACCESS).findList();
-        } else if (authenticatorService.getCurrentUser().getRole().equals(User.Role.GESTIONAIRE)) {
+        } else if (authenticatorService.getCurrentUser().getRole().equals(User.Role.GESTIONNAIRE)) {
             events = ebeanEventFinder.query().where()
                     .ne("type", Event.EventType.CHANGE_USER_ACCESS)
                     .eq("owner", authenticatorService.getCurrentUser().getName())

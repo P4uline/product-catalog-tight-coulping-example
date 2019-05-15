@@ -44,7 +44,7 @@
         
         <ul>
         @for(event <- events) {
-            @if(user.getRole.equals(User.Role.GESTIONAIRE)) {
+            @if(user.getRole.equals(User.Role.GESTIONNAIRE)) {
                 @if(!event.`type`.equals(EventType.POPULATE_DATABASE_FROM_DATAFILE) && event.owner.equals(user.getName)) {
                     <li>@event</li>
                 }

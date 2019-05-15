@@ -14,7 +14,7 @@ public class User extends Model {
     private final String name;
     private final Role role;
     
-    public enum Role { ADMIN, GESTIONAIRE, SUPER_GESTIONNAIRE }
+    public enum Role { ADMIN, GESTIONNAIRE, SUPER_GESTIONNAIRE }
 
     public User(String name, Role role) {
         this.name = name;
