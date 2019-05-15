@@ -57,7 +57,7 @@ public class EventServiceTest {
 
         Mockito.when(finder.all()).thenReturn(events);
 
-        List<Event> actual = eventServiceUnderTest.findProuctEvents("34283");
+        List<Event> actual = eventServiceUnderTest.findProductEvents("34283");
 
         List<Event> expected = events.stream()
                 .filter(e -> !e.type.equals(CHANGE_USER_ACCESS))

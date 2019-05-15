@@ -30,7 +30,7 @@ public class EventService {
         }).collect(toList());
     }
     
-    public List<Event> findProuctEvents(String ean) {
+    public List<Event> findProductEvents(String ean) {
         return findEvents().stream().filter(e -> e.ean.equals(ean)).collect(toList());
     }
 
