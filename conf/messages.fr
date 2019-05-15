@@ -1,4 +1,4 @@
-welcome.hiquea=Bienvenue à Hiquea
+welcome.hiquea=Bienvenue sur notre catalogue
 welcome.ready=Votre nouvelle application est prête
 welcome.list.of.products=Consulter nos tops produits
 welcome.create.product=Créer un nouveau produit
