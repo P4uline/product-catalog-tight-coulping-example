@@ -137,6 +137,56 @@ public class EventServiceTest {
                 .collect(toList());
         assertThat(actual).isEqualTo(expected);
     }
+    
+    /*
+    @Test
+    public void gestionnaire_should_see_all_own_events_but_no_CONNECTION_USER_event() {
 
+        Mockito.when(authenticatorServiceMock.getCurrentUser()).thenReturn(new User("John Doe", GESTIONNAIRE));
+        List<Event> events = new ArrayList<>();
+        events.add(newEvent(CONSULT_ALL_PRODUCTS, "no-ean", "Jane Doe"));
+        events.add(newEvent(CHANGE_USER_ACCESS, "no-ean", "Jane Doe"));
+        events.add(newEvent(CONSULT_PRODUCT, "34283", "Jane Doe"));
+        events.add(newEvent(EDIT_PRODUCT, "34283", "John Doe"));
+        events.add(newEvent(CONSULT_PRODUCT, "34283", "John Doe"));
+        events.add(newEvent(CONSULT_ALL_PRODUCTS, "34283", "John Doe"));
+        events.add(newEvent(CREATE_PRODUCT, "1234", "John Doe"));
+        events.add(newEvent(CHANGE_USER_ACCESS, "no-ean", "John Doe"));
+
+        Mockito.when(finder.all()).thenReturn(events);
+
+        List<Event> actual = eventServiceUnderTest.findEvents();
+
+        List<Event> expected = events.stream()
+                .filter(e -> !e.type.equals(CHANGE_USER_ACCESS))
+                .filter(e -> !e.type.equals(CONNECTION_USER))
+                .filter(e -> e.owner.equals("John Doe"))
+                .collect(toList());
+        assertThat(actual).isEqualTo(expected);
+    }
+
+    @Test
+    public void super_gestionnaire_should_see_all_events_but_no_CONNECTUON_USER_event() {
+        Mockito.when(authenticatorServiceMock.getCurrentUser()).thenReturn(new User("George Abitbol", SUPER_GESTIONNAIRE));
+        List<Event> events = new ArrayList<>();
+        events.add(newEvent(CONSULT_ALL_PRODUCTS, "no-ean", "Jane Doe"));
+        events.add(newEvent(CHANGE_USER_ACCESS, "no-ean", "Jane Doe"));
+        events.add(newEvent(CONSULT_PRODUCT, "34283", "Jane Doe"));
+        events.add(newEvent(EDIT_PRODUCT, "34283", "John Doe"));
+        events.add(newEvent(CONSULT_PRODUCT, "34283", "John Doe"));
+        events.add(newEvent(CONSULT_ALL_PRODUCTS, "34283", "John Doe"));
+        events.add(newEvent(CREATE_PRODUCT, "1234", "John Doe"));
+
+        Mockito.when(finder.all()).thenReturn(events);
+
+        List<Event> actual = eventServiceUnderTest.findEvents();
+
+        List<Event> expected = events.stream()
+                .filter(e -> !e.type.equals(CHANGE_USER_ACCESS))
+                .filter(e -> !e.type.equals(CONNECTION_USER))
+                .collect(toList());
+        assertThat(actual).isEqualTo(expected);
+    }
+    */
     
 }
