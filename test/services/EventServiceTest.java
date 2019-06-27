@@ -138,6 +138,8 @@ public class EventServiceTest {
         assertThat(actual).isEqualTo(expected);
     }
     
+    /*
+    
     @Test
     public void gestionnaire_should_see_all_own_events_but_no_CONNECTION_USER_event() {
 
@@ -188,5 +190,7 @@ public class EventServiceTest {
                 .collect(toList());
         assertThat(actual).isEqualTo(expected);
     }
+    
+     */
     
 }
