@@ -3,11 +3,14 @@ package services;
 import io.ebean.Finder;
 import models.Event;
 import models.User;
+import play.data.validation.Constraints;
 
 import javax.inject.Inject;
 import java.util.List;
 
 import static java.util.stream.Collectors.toList;
+import static models.Event.EventType.CHANGE_USER_ACCESS;
+import static models.User.Role.*;
 
 public class EventService {
     
@@ -19,12 +22,14 @@ public class EventService {
         User currentUser = authenticatorService.getCurrentUser();
         
         return getEventFinder().all().stream().filter(e -> {
-            if (!currentUser.getRole().equals(User.Role.ADMIN)) {
-                if (currentUser.getRole().equals(User.Role.GESTIONNAIRE)) {
-                    return !e.type.equals(Event.EventType.CHANGE_USER_ACCESS) && e.owner.equals(currentUser.getName());  
-                } else if (currentUser.getRole().equals(User.Role.SUPER_GESTIONNAIRE)) {
-                    return !e.type.equals(Event.EventType.CHANGE_USER_ACCESS);
-                }
+            User.Role userRole = currentUser.getRole();
+            Event.@Constraints.Required EventType eventType = e.type;
+            @Constraints.Required String eventOwner = e.owner;
+            
+            if (userRole.equals(GESTIONNAIRE)) {
+                return !eventType.equals(CHANGE_USER_ACCESS) && eventOwner.equals(currentUser.getName());  
+            } else if (userRole.equals(SUPER_GESTIONNAIRE)) {
+                return !eventType.equals(CHANGE_USER_ACCESS);
             }
             return true;
         }).collect(toList());
