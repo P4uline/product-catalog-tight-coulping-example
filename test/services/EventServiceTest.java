@@ -144,6 +144,7 @@ public class EventServiceTest {
 
         Mockito.when(authenticatorServiceMock.getCurrentUser()).thenReturn(new User("John Doe", GESTIONNAIRE));
         List<Event> events = new ArrayList<>();
+        events.add(newEvent(CONNECTION_USER, "no-ean", "John Doe"));
         events.add(newEvent(CONSULT_ALL_PRODUCTS, "no-ean", "Jane Doe"));
         events.add(newEvent(CHANGE_USER_ACCESS, "no-ean", "Jane Doe"));
         events.add(newEvent(CONSULT_PRODUCT, "34283", "Jane Doe"));
@@ -169,6 +170,7 @@ public class EventServiceTest {
     public void super_gestionnaire_should_see_all_events_but_no_CONNECTUON_USER_event() {
         Mockito.when(authenticatorServiceMock.getCurrentUser()).thenReturn(new User("George Abitbol", SUPER_GESTIONNAIRE));
         List<Event> events = new ArrayList<>();
+        events.add(newEvent(CONNECTION_USER, "no-ean", "George Abitbol"));
         events.add(newEvent(CONSULT_ALL_PRODUCTS, "no-ean", "Jane Doe"));
         events.add(newEvent(CHANGE_USER_ACCESS, "no-ean", "Jane Doe"));
         events.add(newEvent(CONSULT_PRODUCT, "34283", "Jane Doe"));
